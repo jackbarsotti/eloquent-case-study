@@ -2,7 +2,7 @@
 
 Exact rebuild of the Eloquent AI Part B reference app.
 
-- Live site: LIVE_URL
+- Live site: https://eloquent-case-study-eight.vercel.app
 - Reference: https://project-eloquentcasestudy.magicpatterns.app/
 
 ## What it is
@@ -85,3 +85,7 @@ src/
 ## Deploy
 
 Hosted on Vercel. `vercel.json` sends every path to `index.html`, so a refresh works on any page.
+
+```bash
+npx vercel deploy --prod
+```
