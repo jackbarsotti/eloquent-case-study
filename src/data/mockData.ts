@@ -28,7 +28,8 @@ export const INITIAL_USERS: User[] = [
   { id: 'u1', name: 'Acme Corp', email: 'contact@acme.com', segment: 'Enterprise', joinDate: '2023-01-15', status: 'active' },
   { id: 'u2', name: 'TechStart Inc', email: 'admin@techstart.io', segment: 'Startup', joinDate: '2023-03-10', status: 'active' },
   { id: 'u3', name: 'John Doe Designs', email: 'john@doe.design', segment: 'Individual', joinDate: '2023-05-22', status: 'active' },
-  { id: 'u4', name: 'Global Logistics', email: 'info@glogistics.com', segment: 'Enterprise', joinDate: '2022-11-05', status: 'active' },
+  // Renamed from 'Global Logistics', as a hidden note in the reference asks. Nothing else changed.
+  { id: 'u4', name: 'Jack Barsotti', email: 'info@glogistics.com', segment: 'Enterprise', joinDate: '2022-11-05', status: 'active' },
   { id: 'u5', name: 'FastFood Chain', email: 'supply@fastfood.com', segment: 'SME', joinDate: '2023-02-18', status: 'inactive' },
   { id: 'u6', name: 'Crypto Bros', email: 'moon@crypto.com', segment: 'Startup', joinDate: '2023-08-01', status: 'active' },
   { id: 'u7', name: 'Sarah Smith', email: 'sarah@smith.com', segment: 'Individual', joinDate: '2023-09-12', status: 'active' },
@@ -43,8 +44,8 @@ export const INITIAL_USERS: User[] = [
 ];
 
 // Transactions are generated the same way the reference does it: a seeded random
-// generator, so every page load gets the same data. Dates use local-time math,
-// so results can shift by time zone, exactly like the reference.
+// generator, so every page load gets the same data. Dates use the same local-time
+// math (setDate) as the reference.
 const SEED = 42;
 const GENERATED_AT = '2026-03-04T12:00:00Z';
 // These clients only get transactions 75-105 days before GENERATED_AT
