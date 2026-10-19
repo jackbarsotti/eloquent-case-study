@@ -254,6 +254,12 @@ Checked before the rename below, so any difference would be a real gap.
 | CSS | Every generated rule compared | Same rules in the same order. Only 4 unused classes differ. |
 | Formulas | `npm test`: unit tests built from reference readings, including after edits | All pass |
 
+Live site (https://eloquent-case-study-eight.vercel.app, after the rename):
+- Screens: the same 145 screenshots match the checked build exactly.
+- Against the reference, only the renamed client differs: 2 text nodes, in the 45 screenshots that show u4's name. Nothing else moves or changes style.
+- Behavior: all 22 experiments give the reference's results once "Global Logistics" reads "Jack Barsotti".
+- Every path returns the app with status 200, so refresh works on detail pages.
+
 Bug found and fixed during this check: the build first skipped the reference's one-render "Loading entity..." step. On mobile that kept the dashboard's scroll offset (198 px) on the detail page. The build now loads the client the same way and lands at the top.
 
 ## 12. Planned differences
