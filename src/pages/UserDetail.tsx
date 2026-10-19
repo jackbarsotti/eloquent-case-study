@@ -5,6 +5,7 @@ import { useData } from '../context/DataContext';
 import type { Segment, User } from '../data/mockData';
 import { computeUserStats } from '../utils/kpiCalculations';
 import { formatDate, formatLastActive, formatNumber, toDateInputValue } from '../utils/format';
+import { buildUserUpdates } from '../utils/userUpdates';
 import { Card } from '../components/ui/Card';
 import { Button } from '../components/ui/Button';
 
@@ -51,16 +52,10 @@ export function UserDetail() {
 
   const handleSave = async () => {
     setIsSaving(true);
-    const updates: Partial<User> = { segment };
-    // Financial values are saved only while the Financial Overview is in edit mode
-    if (isEditingFinancials) {
-      updates.lifetimeValueOverride = lifetimeValue;
-      updates.transactionCountOverride = transactionCount;
-      // An empty date keeps the previous value
-      if (lastActivityDate) {
-        updates.lastActivityOverride = new Date(lastActivityDate).toISOString();
-      }
-    }
+    const updates = buildUserUpdates(
+      { segment, lifetimeValue, transactionCount, lastActivityDate },
+      isEditingFinancials,
+    );
     await updateUser(user.id, updates);
     setIsSaving(false);
     setIsEditingFinancials(false);

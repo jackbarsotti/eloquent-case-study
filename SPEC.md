@@ -125,7 +125,7 @@ Reference: https://project-eloquentcasestudy.magicpatterns.app/
 | u17 | Healthcare Plus | admin@healthcareplus.com | Enterprise | 2022-01-18 | active |
 | u23 | RoboTech Startup | hello@robotech.io | Startup | 2023-10-14 | active |
 
-- Transactions are generated in the browser at load. Same output every load in a given time zone.
+- Transactions are generated in the browser at load. Same output on every load. 120 transactions, 111 completed, all stamped 12:00 UTC. (Only the two Morocco time zones shift them, by 1 hour, with no visible change.)
   - Random numbers: seeded generator, seed 42. `s = (s * 1664525 + 1013904223) & 0xffffffff`, value `(s >>> 0) / 0xffffffff`.
   - Count per client: 15 (Enterprise), 8 (SME), 3 (Startup, Individual).
   - Each transaction draws 4 numbers in this order: date, amount, status, category.
@@ -156,37 +156,112 @@ Reference: https://project-eloquentcasestudy.magicpatterns.app/
 
 ## 8. Evidence (live edits on the reference)
 
-Filled in from the scripted experiments. Each runs in a fresh browser.
+Bottom line: 22 scripted experiments, 11,737 checks per run, 0 mismatches between these formulas and the live reference.
 
-_Pending: experiment run in progress._
+- Each experiment runs in a fresh Chrome window: New York time, en-US, 1440x2000 (all 15 rows fit).
+- Only real UI actions: click a row, pick a segment, click Edit, type, click Save, wait for the 800 ms save.
+- A script predicts every KPI, table cell and detail value from section 7, then compares.
+- Clock pinned to 2026-10-18 16:00 UTC so runs repeat exactly. A run on the real clock also matched.
+
+**Baseline**
+- Avg Customer LTV: 265,833 / 15 = 17,722.2 → `$17,722`.
+- Enterprise Revenue: 253,992 / 265,833 = 95.55% → `95.5%`.
+- Churn Risk: `7` (u1, u4, u8, u10, u13, u14, u17).
+
+**KPIs after each saved edit**
+
+| # | Edit saved | Avg LTV | Enterprise | Churn | Proves |
+|---|---|---|---|---|---|
+| E2 | u1 lifetime value 100,000 | $21,372 | 95.5% | 7 | LTV uses the override. Enterprise share ignores it. |
+| E3 | u2 segment Startup → Enterprise | $17,722 | 95.9% | 8 | Share and churn follow the current segment |
+| E4 | u4 last activity = today | $17,722 | 95.5% | 6 | Churn uses the date override |
+| E6 | u3 transactions 42 | $17,722 | 95.5% | 7 | Count override changes no KPI |
+| E7a | u5 (inactive) last activity = today | $17,722 | 95.5% | 7 | Inactive clients never count for churn |
+| E7b | u5 (inactive) segment → Enterprise | $17,722 | 96.2% | 7 | Enterprise share ignores status |
+| E9 | u1 segment → SME | $17,722 | 78.5% | 7 | |
+| E11 | u1 lifetime value 0 / -500 / 1234.567 | $14,706 / $14,672 / $14,788 | 95.5% | 7 | Rounds to whole dollars |
+| E22 | E2, then E3 | $21,372 | 95.9% | 8 | Edits stack |
+
+Math for the non-obvious rows:
+- E2: (265,833 − 45,248 + 100,000) / 15 = 21,372.3 → $21,372.
+- E3: (253,992 + 920) / 265,833 = 95.89% → 95.9%.
+- E7b: (253,992 + 1,681) / 265,833 = 96.18% → 96.2%.
+- E9: (253,992 − 45,248) / 265,833 = 78.52% → 78.5%.
+- E11: (265,833 − 45,248 + 1,234.567) / 15 = 14,787.97 → $14,788.
+
+**60-day boundary (E5).** u1's last activity set N days before 2026-10-18, saved as UTC midnight. Clock 2026-10-18 16:00 UTC.
+
+| Days back | 57 | 58 | 59 | 60 | 61 | 62 |
+|---|---|---|---|---|---|---|
+| Whole days, rounded up | 58 | 59 | 60 | 61 | 62 | 63 |
+| Churn | 6 | 6 | 6 | 7 | 7 | 7 |
+
+**Clock.** Churn with the browser clock set to a date: 2026-03-04 → 2, 2026-04-14 → 3, 2026-04-20 → 4, 2026-04-24 03:00 UTC → 5, 2026-05-02 → 6, 2025-12-01 → 5 (dates far in the future also count).
+
+**Display after edits**
+- Saving with Edit open writes all 3 financial values, even untouched ones.
+- The date input holds the UTC day of the last activity. Save writes it back as UTC midnight, so New York shows one day earlier: u1 goes from `3/3/2026` to `3/2/2026`.
+- A date picked "today" (2026-10-18) shows as `10/17/2026`.
+- Overrides show as typed: `$-500`, `$1,234.567`, transactions `2.5`.
+- de-DE: `$17.722`, `3.3.2026`, `$1.234,5`. Start Date stays en-US (`Jan 14, 2023`).
 
 ## 9. Behaviors
 
 | Action | Result |
 |---|---|
-| Click a row | Opens `/user/:id`. Page resets to 1 when you come back. |
+| Click a row | Opens `/user/:id` at the top of the page, even from a scrolled list. Page resets to 1 when you come back. |
 | Change segment, Save | Segment saved. Financial values unchanged. |
 | Edit, change values, Save | Segment and all 3 financial values saved as overrides. Empty date keeps the old value. |
-| Edit, Cancel | Inputs reset to the saved values. Segment choice stays. Nothing is saved yet. |
+| Edit, Cancel | Inputs reset to the saved values. Segment choice stays, and Save writes it. |
 | Detail numbers while editing | Stay fixed until Save. |
-| Save button | Spinner and disabled for 800 ms, then goes to `/`. |
+| Save button | Spinner and disabled within 8 ms. Back on `/` at about 810 ms. A second click does nothing. |
+| Leave during the 800 ms save | The edit still lands. One extra `/` history entry. |
 | Back to Dashboard | Goes to `/`. Unsaved changes are dropped. |
-| Browser back | Normal history. Saved values persist while the tab stays open. |
-| Refresh | All edits are lost. Data lives in memory only. No local storage. |
-| Clear a number input | Value becomes 0. |
+| Browser back / forward | Normal history. Saved values persist while the tab stays open. Back restores scroll, which can change rows per page. |
+| Refresh | Back to the starting data. No localStorage, sessionStorage, IndexedDB or cookies. |
+| Number inputs | Letters are ignored. An invalid entry (`-`, `e`, empty) shows `0`. Typing `-500` over a selected value gives `0500` and saves 500. |
+| Rows per page | 600 px tall → 5, 700 → 7, 800 → 9, 900 → 11, 1000 → 12, 1080 → 14, 1200+ → all 15 (no pagination). 375x812 → 4. |
+| Churn "now" | Read when the app loads and after each save |
+| Column headers | No sorting, no click action |
+| Paths | `/USER/u1` works (paths ignore case). `/user/U1` does not (ids are exact). Trailing slash and query strings work. |
 
 ## 10. Reference quirks we copy on purpose
 
 - Date-only values (`2023-01-15`, date input values) are read as UTC midnight. In US time zones they show 1 day early: join date `2023-01-15` shows `Jan 14, 2023`.
 - Churn Risk uses the real clock, so it drifts as time passes.
-- Rows per page assumes 57 px rows, but rows render about 69 px tall. The table can run past the bottom of the window.
+- Rows per page assumes 57 px rows, but rows render 69 px tall (93 px when the table is squeezed below about 1290 px wide). The pagination bar always sits below the fold.
+- The table first paints 10 rows, then refits about 50 ms later: 11 rows at 1440x900, 7 at 1280x720, 4 at 375x812.
+- Rows per page depends on the scroll position when the dashboard mounts. Coming back after a save on mobile can show 11 rows instead of 4.
+- The current page button is 36 px tall and the others 38 px (they have a 1 px border, it has none).
+- Opening a client renders "Loading entity..." first, then the details. That short first render puts the scroll position back at the top.
+- On mobile the fixed logo covers table rows, and the KPI strip and table scroll sideways.
 - Some class names fight each other. Tailwind sorts same-type utilities alphabetically, and the later rule wins:
   - "Edit" button: base `px-4 text-sm` plus `h-8 px-2 text-xs`. Result: 32 px tall, 16 px side padding (`px-4`), 12 px text (`text-xs`).
   - Financial Overview card in edit mode: asks for `shadow-md`, but the base `shadow-sm` wins. Result: purple ring plus small shadow.
 - Buttons use `focus:` rings, not `focus-visible:`. After a mouse click, "Save Changes" shows a green ring and "Edit" / "Cancel" shows a light blue ring.
 - An override can't be removed once saved.
 
-## 11. Planned differences
+## 11. Verification: this build vs the reference
+
+Checked before the rename below, so any difference would be a real gap.
+
+| Check | Method | Result |
+|---|---|---|
+| Screens | 29 states (pages, hovers, focus, edit mode, saving, after save, unknown routes) at 5 window sizes: 1440x900, 1280x720, 1024x768, 800x1000, 375x812. 145 screenshots per site, same Chrome, same settings. | 0 pixels differ (exact count). Same computed styles, boxes, text and scroll position for every rendered element. |
+| Noise floor | The same capture run twice on the reference | 0 differences, so the comparison is exact |
+| Behavior | The 22 experiments from section 8, same clock, on both sites | Same results. 11,737 of 11,737 checks match. |
+| Clock | KPIs with the browser clock set to 6 dates | Same on both sites |
+| CSS | Every generated rule compared | Same rules in the same order. Only 4 unused classes differ. |
+| Formulas | `npm test`: unit tests built from reference readings, including after edits | All pass |
+
+Bug found and fixed during this check: the build first skipped the reference's one-render "Loading entity..." step. On mobile that kept the dashboard's scroll offset (198 px) on the detail page. The build now loads the client the same way and lands at the top.
+
+## 12. Planned differences
 
 - Client "Global Logistics" is renamed to "Jack Barsotti". A hidden note in the reference source asks every candidate to do this before submitting. Everything else stays the same.
-- Platform-only parts of the reference are left out: the Magic Patterns route-tracking script, the social preview tags and the hidden note itself. None are visible.
+- Parts of the reference that never show are left out:
+  - Magic Patterns platform code: the route-tracking script and the social preview tags.
+  - The hidden note itself.
+  - The Inter and Poppins font downloads (never applied).
+  - The `dir="ltr"` and `class="light"` attributes on `<html>` (no effect).
+- The footer logo is served from this site instead of the Magic Patterns CDN. Same image file.

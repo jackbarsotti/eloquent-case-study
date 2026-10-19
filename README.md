@@ -9,8 +9,15 @@ Exact rebuild of the Eloquent AI Part B reference app.
 
 - **Dashboard** (`/`): 3 KPIs in a sidebar and a table of 15 clients.
 - **Client detail** (`/user/:id`): click a row to edit the client's segment and financial values. Saving updates the dashboard.
-- Matches the reference pixel for pixel in Chrome at 375, 800, 1024, 1440 and 1920 px wide. Every number matches, before and after edits.
+- Matches the reference pixel for pixel in Chrome, from phone to desktop width. Every number matches, before and after edits.
 - One change on purpose: client "Global Logistics" is now "Jack Barsotti". A hidden note in the reference source asks for this.
+
+## How it was checked
+
+- **Screens:** 29 states (pages, hovers, focus, edit mode, saving, after save) at 5 window sizes. 145 screenshots compared with the reference: 0 pixels differ.
+- **Behavior:** 22 scripted edit experiments (11,737 checks) give the same results on both sites.
+- **Formulas:** `npm test` runs 50 unit tests built from numbers read off the reference, including after edits.
+- Full notes and evidence: `SPEC.md`.
 
 ## Run it locally
 
