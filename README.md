@@ -2,7 +2,7 @@
 
 Exact rebuild of the Eloquent AI Part B reference app.
 
-- Live site: https://eloquent-case-study-eight.vercel.app
+- Live site: https://jack-barsotti-eloquent.vercel.app
 - Reference: https://project-eloquentcasestudy.magicpatterns.app/
 
 ## What it is

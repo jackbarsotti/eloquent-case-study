@@ -254,7 +254,7 @@ Checked before the rename below, so any difference would be a real gap.
 | CSS | Every generated rule compared | Same rules in the same order. Only 4 unused classes differ. |
 | Formulas | `npm test`: unit tests built from reference readings, including after edits | All pass |
 
-Live site (https://eloquent-case-study-eight.vercel.app, after the rename):
+Live site (https://jack-barsotti-eloquent.vercel.app, after the rename):
 - Screens: the same 145 screenshots match the checked build exactly.
 - Against the reference, only the renamed client differs: 2 text nodes, in the 45 screenshots that show u4's name. Nothing else moves or changes style.
 - Behavior: all 22 experiments give the reference's results once "Global Logistics" reads "Jack Barsotti".
