@@ -13,33 +13,41 @@ const INPUT_CLASSES =
 
 export function UserDetail() {
   const { id } = useParams<{ id: string }>();
-  const { users } = useData();
-  const user = users.find((u) => u.id === id);
+  const navigate = useNavigate();
+  const { users, transactions, updateUser } = useData();
+  const [user, setUser] = useState<User>();
+  const [segment, setSegment] = useState<Segment>('Individual');
+  const [isSaving, setIsSaving] = useState(false);
+  const [isEditingFinancials, setIsEditingFinancials] = useState(false);
+  const [lifetimeValue, setLifetimeValue] = useState(0);
+  const [transactionCount, setTransactionCount] = useState(0);
+  const [lastActivityDate, setLastActivityDate] = useState('');
 
   useEffect(() => {
     document.title = 'Eloquent Case Study';
   }, []);
 
-  // Unknown ids stay on this message, like the reference
+  // Load the client after the first render, and again after every save, like the reference.
+  // The first render shows "Loading entity...". That short page also puts the scroll
+  // position back at the top when you arrive from a scrolled dashboard.
+  useEffect(() => {
+    const found = users.find((u) => u.id === id);
+    if (!found) return;
+    const stats = computeUserStats(found, transactions);
+    setUser(found);
+    setSegment(found.segment);
+    setLifetimeValue(stats.totalSpent);
+    setTransactionCount(stats.txCount);
+    setLastActivityDate(toDateInputValue(stats.lastActivityISO));
+  }, [id, users, transactions]);
+
+  // Unknown ids stay on this message
   if (!user) {
     return <div className="p-8 text-center text-gray-500">Loading entity...</div>;
   }
 
-  return <UserDetailView key={user.id} user={user} />;
-}
-
-function UserDetailView({ user }: { user: User }) {
-  const navigate = useNavigate();
-  const { transactions, updateUser } = useData();
   // Shown values come from saved data only, so they stay fixed until Save
   const stats = computeUserStats(user, transactions);
-
-  const [segment, setSegment] = useState<Segment>(user.segment);
-  const [isSaving, setIsSaving] = useState(false);
-  const [isEditingFinancials, setIsEditingFinancials] = useState(false);
-  const [lifetimeValue, setLifetimeValue] = useState(stats.totalSpent);
-  const [transactionCount, setTransactionCount] = useState(stats.txCount);
-  const [lastActivityDate, setLastActivityDate] = useState(toDateInputValue(stats.lastActivityISO));
 
   const handleSave = async () => {
     setIsSaving(true);

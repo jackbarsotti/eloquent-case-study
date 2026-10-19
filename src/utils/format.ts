@@ -5,6 +5,9 @@
 // because that changes how the browser spaces the characters.
 export const formatNumber = (value: number, locale?: string) => value.toLocaleString(locale);
 
+// 'active' -> 'Active'
+export const formatStatus = (status: string) => status.charAt(0).toUpperCase() + status.slice(1);
+
 // '2026-03-03T12:00:00.000Z' -> '3/3/2026'. No activity -> 'Never'.
 export const formatLastActive = (dateISO: string, locale?: string) =>
   dateISO ? new Date(dateISO).toLocaleDateString(locale) : 'Never';

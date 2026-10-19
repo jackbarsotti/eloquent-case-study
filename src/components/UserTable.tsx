@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
 import type { Segment, Transaction, User } from '../data/mockData';
 import { computeUserStats } from '../utils/kpiCalculations';
-import { formatLastActive, formatNumber, formatShortDate } from '../utils/format';
+import { formatLastActive, formatNumber, formatShortDate, formatStatus } from '../utils/format';
 import { Card } from './ui/Card';
 
 // Rows per page are fitted to the window height using these sizes (px)
@@ -103,7 +103,7 @@ export function UserTable({ users, transactions }: UserTableProps) {
                         className={`inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs font-medium ${isActive ? 'bg-green-50 text-green-700' : 'bg-gray-50 text-gray-600'}`}
                       >
                         <span className={`w-1.5 h-1.5 rounded-full ${isActive ? 'bg-green-500' : 'bg-gray-400'}`} />
-                        {user.status.charAt(0).toUpperCase() + user.status.slice(1)}
+                        {formatStatus(user.status)}
                       </span>
                     </td>
                     <td className="px-6 py-4 text-gray-600">{formatShortDate(user.joinDate)}</td>
